@@ -51,12 +51,68 @@ queue()
         console.log(data1995);
         console.log(data2010);
 
+        d3.selectAll('.btn').on('click', function() {
+            var year = d3.select(this).attr('id');
+
+            if (year == 'year-1995') {
+                draw(data1995);
+            } else {
+                draw(data2010);
+            }
+
+        })
 
 
     });
 
 function draw(data){
+    console.log(data);
 
+
+    var nodes = plot.selectAll('.country')
+            .data(data, function(d){ return d.cCode}); //keyFunction
+
+
+    var nodesEnter = nodes.enter().append('g')
+        .attr('class','country')
+        .attr ('transform', function(d){
+        return 'translate('+scaleX(d.gdpPerCap)+','+scaleY(d.co2PerCap)+')';})
+
+        .on('click', function(d){
+            nodes.selectAll('circle').style('stroke','rgb(80,80,80)')
+            d3.select(this).select('circle').style('stroke','red');
+
+        })
+
+    nodesEnter.append('circle')
+        .attr('r', function(d){
+            return scaleR(d.co2Total);
+        })
+        .style('fill', 'rgba(80,80,80,.1)')
+        .style('stroke', 'rgb(50,50,50)')
+        .style('stroke-width', '1px')
+
+
+    ;
+    nodesEnter.append('text')
+        .text(function(d){
+            return d.cCode;
+        })
+        .attr('text-anchor','middle')
+        .style('font-size','8px')
+        .style('fill', 'rgb(80,80,80)');
+
+    nodes.exit().remove();
+
+    nodes
+        .transition().duration(600)
+        .attr('transform', function(d){
+            return 'translate('+scaleX(d.gdpPerCap) + ',' + scaleY(d.co2PerCap) +')'
+        })
+        .select('circle')
+        .attr('r', function(d){
+            return scaleR(d.co2Total);
+        })
 
 }
 
